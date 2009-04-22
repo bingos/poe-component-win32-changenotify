@@ -1,6 +1,9 @@
 POE::Component::Win32::ChangeNotify
 ===================================
 
+1.08	Tue Feb 19 14:11:50 GMT 2008
+	- Added Devel::AssertOS checks to Makefile.PL
+
 1.07	Mon Jan  7 10:15:51 GMT 2008
 	- Tidied up test names
 
