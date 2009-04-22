@@ -12,21 +12,21 @@ use Win32::ChangeNotify;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub spawn {
-  my ($package) = shift;
+  my $package = shift;
   croak "$type needs an even number of parameters" if @_ & 1;
   my %params = @_;
 
-  $params{ lc $_ } = delete ( $params{ $_ } ) for keys %params;
+  $params{ lc $_ } = delete $params{ $_ } for keys %params;
   my $options = delete $params{'options'};
 
   my $self = bless \%params, $package;
 
   $self->{session_id} = POE::Session->create(
 	  object_states => [
-	  	$self => [ qw(_start child_closed child_error child_stderr child_stdout shutdown monitor unmonitor) ],
+	  	$self => [ qw(_start _sig_chld child_closed child_error child_stderr child_stdout shutdown monitor unmonitor) ],
 	  ],
 	  ( ( defined ( $options ) and ref ( $options ) eq 'HASH' ) ? ( options => $options ) : () ),
   )->ID();
@@ -47,7 +47,14 @@ sub _start {
 	$kernel->refcount_increment( $self->{session_id} => __PACKAGE__ );
   }
 
+  $kernel->sig( 'CHLD' => '_sig_chld' );
+
   undef;
+}
+
+sub _sig_chld {
+  my ($kernel,$self) = @_[KERNEL,OBJECT];
+  $kernel->sig_handled();
 }
 
 sub shutdown {
@@ -194,9 +201,7 @@ sub launch_change_notify {
   READ:
   while ( sysread ( STDIN, $raw, $size ) ) {
     my $requests = $filter->get( [ $raw ] );
-    foreach my $req ( @{ $requests } ) {
-	    &watch_path($filter,$req);
-    }
+    watch_path($filter,$_) for @{ $requests };
   }
 }
 
@@ -222,7 +227,7 @@ sub watch_path {
 	  my $replies = $filter->put( [ $req ] );
 	  print STDOUT @$replies;
 	} else {
-	  delete ( $req->{result} );
+	  delete $req->{result};
 	  $req->{error} = "Something bad happened with the Win32::ChangeNotify object";
 	  my $replies = $filter->put( [ $req ] );
 	  print STDOUT @$replies;
@@ -237,14 +242,14 @@ __END__
 
 =head1 NAME
 
-POE::Component::Win32::ChangeNotify - A POE wrapper around L<Win32::ChangeNotify|Win32::ChangeNotify>.
+POE::Component::Win32::ChangeNotify - A POE wrapper around L<Win32::ChangeNotify>.
 
 =head1 SYNOPSIS
 
    use POE;
    use POE::Component::Win32::ChangeNotify;
 
-   my ($poco) = POE::Component::Win32::ChangeNotify->spawn( alias => 'blah' );
+   my $poco = POE::Component::Win32::ChangeNotify->spawn( alias => 'blah' );
 
    POE::Session->create(
    	package_states => [ 
@@ -283,7 +288,7 @@ POE::Component::Win32::ChangeNotify - A POE wrapper around L<Win32::ChangeNotify
 
 =head1 DESCRIPTION
 
-POE::Component::Win32::ChangeNotify is a POE wrapper around L<Win32::ChangeNotify|Win32::ChangeNotify> that provides non-blocking change notify events to your POE sessions.
+POE::Component::Win32::ChangeNotify is a POE wrapper around L<Win32::ChangeNotify> that provides non-blocking change notify events to your POE sessions.
 
 =head1 METHODS
 
@@ -299,7 +304,7 @@ Takes a number of arguments, all of which are optional.
 
 =item session_id
 
-Takes no arguments, returns the L<POE::Session|POE::Session> ID of the component. Useful if you don't want to use
+Takes no arguments, returns the L<POE::Session> ID of the component. Useful if you don't want to use
 aliases.
 
 =back
@@ -358,5 +363,5 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 SEE ALSO
 
-L<Win32::ChangeNotify|Win32::ChangeNotify>
+L<Win32::ChangeNotify>
 

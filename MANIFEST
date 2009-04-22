@@ -1,5 +1,7 @@
 lib/POE/Component/Win32/ChangeNotify.pm
 t/1.t
+t/2.t
+test_file
 MANIFEST
 Makefile.PL
 README
