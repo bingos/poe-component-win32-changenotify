@@ -2,13 +2,16 @@ Changes
 examples/synopsis.pl
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
 inc/Module/Install/Makefile.pm
-inc/Module/Install/MakeMaker.pm
 inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
 lib/POE/Component/Win32/ChangeNotify.pm
 Makefile.PL
-MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST			This list of files
+META.yml
 README
 t/1.t
 t/2.t

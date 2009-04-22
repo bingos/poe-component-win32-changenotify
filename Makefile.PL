@@ -1,15 +1,9 @@
 use inc::Module::Install;
-
+name 'POE-Component-Win32-ChangeNotify';
 author 'Chris Williams <chris@bingosnet.co.uk>';
 license 'perl';
-
-WriteMakefile(
-			  'NAME'	=> 'POE::Component::Win32::ChangeNotify',
-			  'PREREQ_PM' => {
-					  'POE'    => 0.31,
-					  'Win32::ChangeNotify' => 0,
-					  'Carp'   => 0,
-					 },
-			  'VERSION_FROM' => 'lib/POE/Component/Win32/ChangeNotify.pm',
-			  'dist' => { 'COMPRESS' => 'gzip --best' },
-			 );
+version_from 'lib/POE/Component/Win32/ChangeNotify.pm';
+requires 'Carp'   => 0;
+requires 'Win32::ChangeNotify' => 0;
+requires 'POE' => 0.38;
+WriteAll();

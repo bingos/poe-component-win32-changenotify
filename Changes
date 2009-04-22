@@ -1,6 +1,10 @@
 POE::Component::Win32::ChangeNotify
 ===================================
 
+1.04	Sat Dec 30 09:01:58 GMT 2006
+	- Makefile.PL is now all M::I.
+	- Changed to sig_child() semantics.
+
 1.03	Tue Sep 26 16:52:05 BST 2006
 	- Switched to Module::Install
 

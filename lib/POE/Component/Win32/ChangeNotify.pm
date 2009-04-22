@@ -8,12 +8,12 @@
 package POE::Component::Win32::ChangeNotify;
 
 use strict;
-use POE 0.31 qw(Wheel::Run Filter::Reference Filter::Line);
+use POE 0.38 qw(Wheel::Run Filter::Reference Filter::Line);
 use Win32::ChangeNotify;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub spawn {
   my $package = shift;
@@ -48,17 +48,13 @@ sub _start {
 	$kernel->refcount_increment( $self->{session_id} => __PACKAGE__ );
   }
 
-  $kernel->sig( 'CHLD' => '_sig_chld' );
+  #$kernel->sig( 'CHLD' => '_sig_chld' );
   $self->{wheels} = { };
   undef;
 }
 
 sub _sig_chld {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
-  if ( $self->{_shutdown} ) {
-    $self->{_wheel_count}--;
-    $kernel->sig( 'CHLD' ) unless $self->{_wheel_count};
-  }
   $kernel->sig_handled();
 }
 
@@ -79,7 +75,7 @@ sub shutdown {
 	  $kernel->refcount_decrement( $wheel_data->{sender} => __PACKAGE__ );
   }
   delete $self->{monitored};
-  $kernel->sig( 'CHLD' ) unless $self->{_wheel_count};
+  #$kernel->sig( 'CHLD' ) unless $self->{_wheel_count};
   $self->{_shutdown} = 1;
   undef;
 }
@@ -118,7 +114,7 @@ sub monitor {
   
   unless ( defined ( $self->{monitored}->{ $args->{path} } ) ) {
     $args->{always} = 1;
-    my ($wheel) = POE::Wheel::Run->new(
+    my $wheel = POE::Wheel::Run->new(
     	Program     => \&_launch_change_notify,
     	ErrorEvent  => 'child_error',             # Event to emit on errors.
     	CloseEvent  => 'child_closed',     # Child closed all output.
@@ -137,6 +133,7 @@ sub monitor {
     	$self->{wheels}->{ $wheel->ID() }->{args} = $args;
     	$self->{wheels}->{ $wheel->ID() }->{sender} = $sender;
 	$self->{monitored}->{ $args->{path} } = $wheel->ID();
+        $kernel->sig_child( $wheel->PID, '_sig_chld' );
     }
   }
 
