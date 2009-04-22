@@ -1,6 +1,9 @@
 POE::Component::Win32::ChangeNotify
 ===================================
 
+1.16	Tue May 13 14:07:50 GMTDT 2008
+	- Added license information
+
 1.14	Fri Mar 14 11:22:18 GMTST 2008
 	- Author tests to xt/
 
