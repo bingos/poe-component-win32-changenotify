@@ -13,8 +13,8 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
-t/1.t
-t/2.t
-t/3.t
-t/4.t
+t/00_startup.t
+t/01_touchme.t
+t/99_pod.t
+t/99_pod_coverage.t
 test_file
