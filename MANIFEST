@@ -1,7 +1,11 @@
+examples/synopsis.pl
 lib/POE/Component/Win32/ChangeNotify.pm
 t/1.t
 t/2.t
+t/3.t
+t/4.t
 test_file
+Changes
 MANIFEST
 Makefile.PL
 README

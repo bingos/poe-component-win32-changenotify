@@ -3,7 +3,7 @@ BEGIN { use_ok('POE::Component::Win32::ChangeNotify') };
 
 use POE;
 
-my $self = POE::Component::Win32::ChangeNotify->spawn( alias => 'blah' );
+my $self = POE::Component::Win32::ChangeNotify->spawn( alias => 'blah', options => { trace => 0 } );
 
 isa_ok ( $self, 'POE::Component::Win32::ChangeNotify' );
 
@@ -11,6 +11,7 @@ POE::Session->create(
 	inline_states => { _start => \&test_start, 
 			   _touch => \&touch_file,
 			   notification => \&file_was_touched },
+	options => { trace => 0 },
 );
 
 $poe_kernel->run();

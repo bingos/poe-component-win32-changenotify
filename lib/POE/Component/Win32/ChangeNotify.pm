@@ -7,16 +7,17 @@
 
 package POE::Component::Win32::ChangeNotify;
 
+use strict;
 use POE 0.31 qw(Wheel::Run Filter::Reference Filter::Line);
 use Win32::ChangeNotify;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub spawn {
   my $package = shift;
-  croak "$type needs an even number of parameters" if @_ & 1;
+  croak "$package needs an even number of parameters" if @_ & 1;
   my %params = @_;
 
   $params{ lc $_ } = delete $params{ $_ } for keys %params;
@@ -48,12 +49,16 @@ sub _start {
   }
 
   $kernel->sig( 'CHLD' => '_sig_chld' );
-
+  $self->{wheels} = { };
   undef;
 }
 
 sub _sig_chld {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
+  if ( $self->{_shutdown} ) {
+    $self->{_wheel_count}--;
+    $kernel->sig( 'CHLD' ) unless $self->{_wheel_count};
+  }
   $kernel->sig_handled();
 }
 
@@ -67,12 +72,15 @@ sub shutdown {
   }
 
   # Clean up wheels before we go.
+  $self->{_wheel_count} = scalar keys %{ $self->{wheels} };
   foreach my $wheel_id ( keys %{ $self->{wheels} } ) {
 	  $self->{wheels}->{ $wheel_id }->{wheel}->kill(9);
 	  my $wheel_data = delete $self->{wheels}->{ $wheel_id };
 	  $kernel->refcount_decrement( $wheel_data->{sender} => __PACKAGE__ );
   }
   delete $self->{monitored};
+  $kernel->sig( 'CHLD' ) unless $self->{_wheel_count};
+  $self->{_shutdown} = 1;
   undef;
 }
 
@@ -111,7 +119,7 @@ sub monitor {
   unless ( defined ( $self->{monitored}->{ $args->{path} } ) ) {
     $args->{always} = 1;
     my ($wheel) = POE::Wheel::Run->new(
-    	Program     => \&launch_change_notify,
+    	Program     => \&_launch_change_notify,
     	ErrorEvent  => 'child_error',             # Event to emit on errors.
     	CloseEvent  => 'child_closed',     # Child closed all output.
 
@@ -148,7 +156,7 @@ sub unmonitor {
 
   if ( defined ( $self->{monitored}->{ $path } ) ) {
 	my $wheel_id = delete $self->{monitored}->{ $path };
-	$self->{wheels}->{ $wheel_id }->{wheel}->kill(9);
+	$self->{wheels}->{ $wheel_id }->{wheel}->kill();
 	my $wheel_data = delete $self->{wheels}->{ $wheel_id };
 	$kernel->refcount_decrement( $wheel_data->{sender} => __PACKAGE__ );
   }
@@ -192,7 +200,7 @@ sub session_id {
   return $_[0]->{session_id};
 }
 
-sub launch_change_notify {
+sub _launch_change_notify {
   binmode(STDIN); binmode(STDOUT); 
   my $raw;
   my $size = 4096;
@@ -201,11 +209,11 @@ sub launch_change_notify {
   READ:
   while ( sysread ( STDIN, $raw, $size ) ) {
     my $requests = $filter->get( [ $raw ] );
-    watch_path($filter,$_) for @{ $requests };
+    _watch_path($filter,$_) for @{ $requests };
   }
 }
 
-sub watch_path {
+sub _watch_path {
   my ($filter,$req) = splice @_, 0, 2;
 
   my $notify = Win32::ChangeNotify->new($req->{path}, $req->{subtree}, $req->{filter});
@@ -246,6 +254,7 @@ POE::Component::Win32::ChangeNotify - A POE wrapper around L<Win32::ChangeNotify
 
 =head1 SYNOPSIS
 
+   use strict;
    use POE;
    use POE::Component::Win32::ChangeNotify;
 

@@ -1,0 +1,8 @@
+POE::Component::Win32::ChangeNotify
+===================================
+
+1.02	Tue Sep 12 18:45:02 BST 2006
+	- Added Changes file.
+	- Added pod and pod coverage tests.
+	- Added examples/ folder.
+	- Fixed use strict.
