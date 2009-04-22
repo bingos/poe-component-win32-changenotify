@@ -13,7 +13,7 @@ use Win32::ChangeNotify;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 sub spawn {
   my $package = shift;
