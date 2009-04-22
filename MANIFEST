@@ -1,12 +1,17 @@
+Changes
 examples/synopsis.pl
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/MakeMaker.pm
+inc/Module/Install/Metadata.pm
 lib/POE/Component/Win32/ChangeNotify.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
 t/1.t
 t/2.t
 t/3.t
 t/4.t
 test_file
-Changes
-MANIFEST
-Makefile.PL
-README
-META.yml                                 Module meta-data (added by MakeMaker)

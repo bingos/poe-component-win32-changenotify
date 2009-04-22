@@ -1,6 +1,9 @@
 POE::Component::Win32::ChangeNotify
 ===================================
 
+1.03	Tue Sep 26 16:52:05 BST 2006
+	- Switched to Module::Install
+
 1.02	Tue Sep 12 18:45:02 BST 2006
 	- Added Changes file.
 	- Added pod and pod coverage tests.
