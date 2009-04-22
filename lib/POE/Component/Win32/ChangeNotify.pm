@@ -13,7 +13,7 @@ use Win32::ChangeNotify;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub spawn {
   my $package = shift;
@@ -247,7 +247,7 @@ __END__
 
 =head1 NAME
 
-POE::Component::Win32::ChangeNotify - A POE wrapper around L<Win32::ChangeNotify>.
+POE::Component::Win32::ChangeNotify - A POE wrapper around Win32::ChangeNotify.
 
 =head1 SYNOPSIS
 

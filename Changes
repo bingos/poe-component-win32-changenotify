@@ -1,6 +1,9 @@
 POE::Component::Win32::ChangeNotify
 ===================================
 
+1.05	Tue Aug 21 12:10:59 BST 2007
+	- Fixes for build_requires and abstract_from in Makefile.PL
+
 1.04	Sat Dec 30 09:01:58 GMT 2006
 	- Makefile.PL is now all M::I.
 	- Changed to sig_child() semantics.
