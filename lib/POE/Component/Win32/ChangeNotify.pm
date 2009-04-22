@@ -8,12 +8,13 @@
 package POE::Component::Win32::ChangeNotify;
 
 use strict;
+use warnings;
 use POE 0.38 qw(Wheel::Run Filter::Reference Filter::Line);
 use Win32::ChangeNotify;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '1.12';
+$VERSION = '1.14';
 
 sub spawn {
   my $package = shift;

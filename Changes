@@ -1,6 +1,9 @@
 POE::Component::Win32::ChangeNotify
 ===================================
 
+1.14	Fri Mar 14 11:22:18 GMTST 2008
+	- Author tests to xt/
+
 1.12	Wed Feb 20 19:16:23 GMT 2008
 	- Oops forgot to no_index 'mylib'.
 
