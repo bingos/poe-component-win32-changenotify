@@ -12,18 +12,15 @@ use Win32::ChangeNotify;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '0.01';
+$VERSION = '1.00';
 
 sub spawn {
   my ($package) = shift;
   croak "$type needs an even number of parameters" if @_ & 1;
   my %params = @_;
 
-  foreach my $param ( keys %params ) {
-     $params{ lc $param } = delete ( $params{ $param } );
-  }
-
-  my $options = delete ( $params{'options'} );
+  $params{ lc $_ } = delete ( $params{ $_ } ) for keys %params;
+  my $options = delete $params{'options'};
 
   my $self = bless \%params, $package;
 
@@ -65,16 +62,16 @@ sub shutdown {
   # Clean up wheels before we go.
   foreach my $wheel_id ( keys %{ $self->{wheels} } ) {
 	  $self->{wheels}->{ $wheel_id }->{wheel}->kill(9);
-	  my $wheel_data = delete ( $self->{wheels}->{ $wheel_id } );
+	  my $wheel_data = delete $self->{wheels}->{ $wheel_id };
 	  $kernel->refcount_decrement( $wheel_data->{sender} => __PACKAGE__ );
   }
-  delete ( $self->{monitored} );
+  delete $self->{monitored};
   undef;
 }
 
 sub monitor {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
-  my ($sender) = $_[SENDER]->ID();
+  my $sender = $_[SENDER]->ID();
 
   # Get the arguments
   my $args;
@@ -86,9 +83,7 @@ sub monitor {
 	$args = { @_[ARG0 .. $#_ ] };
   }
 
-  foreach my $key ( keys %{ $args } ) {
-	  $args->{ lc ( $key ) } = delete ( $args->{ $key } );
-  }
+  $args->{ lc $_ } = delete $args->{$_} for keys %{ $args };
   
   unless ( $args->{path} ) {
 	warn "you must supply a path argument, otherwise what's the point";
@@ -138,20 +133,16 @@ sub unmonitor {
   croak "$state event needs an even number of parameters" if @_ & 1;
   my %params = @_;
 
-  foreach my $key ( keys %params ) {
-	  $params{ lc ( $key ) } = delete( $params{ $key } );
-  }
+  $params{ lc $_ } = delete ( $params{ $_ } ) for keys %params;
 
-  my $path = delete ( $params{path} );
+  my $path = delete $params{path};
 
-  unless ( $path ) {
-	croak "$state requires a path parameter";
-  }
+  croak "$state requires a path parameter" unless $path;
 
   if ( defined ( $self->{monitored}->{ $path } ) ) {
-	my $wheel_id = delete( $self->{monitored}->{ $path } );
+	my $wheel_id = delete $self->{monitored}->{ $path };
 	$self->{wheels}->{ $wheel_id }->{wheel}->kill(9);
-	my $wheel_data = delete ( $self->{wheels}->{ $wheel_id } );
+	my $wheel_data = delete $self->{wheels}->{ $wheel_id };
 	$kernel->refcount_decrement( $wheel_data->{sender} => __PACKAGE__ );
   }
 
@@ -161,24 +152,24 @@ sub unmonitor {
 sub child_closed {
   my ($self,$wheel_id) = @_[OBJECT,ARG0];
 
-  my $wheel_data = delete ( $self->{wheels}->{ $wheel_id } );
-  delete ( $self->{monitored}->{ $wheel_data->{args}->{path} } );
+  my $wheel_data = delete $self->{wheels}->{ $wheel_id };
+  delete $self->{monitored}->{ $wheel_data->{args}->{path} };
   undef;
 }
 
 sub child_error {
   my ($self,$wheel_id) = @_[OBJECT,ARG3];
 
-  my $wheel_data = delete ( $self->{wheels}->{ $wheel_id } );
-  delete ( $self->{monitored}->{ $wheel_data->{args}->{path} } );
+  my $wheel_data = delete $self->{wheels}->{ $wheel_id };
+  delete $self->{monitored}->{ $wheel_data->{args}->{path} };
   undef;
 }
 
 sub child_stdout {
   my ($kernel,$self,$input,$wheel_id) = @_[KERNEL,OBJECT,ARG0,ARG1];
-  delete( $input->{always} );
-  my ($event) = delete( $input->{event} );
-  my ($sender) = delete( $input->{sender} );
+  delete $input->{always};
+  my $event = delete $input->{event};
+  my $sender = delete $input->{sender};
 
   $kernel->post( $sender => $event => $input );
   undef;
@@ -212,10 +203,10 @@ sub launch_change_notify {
 sub watch_path {
   my ($filter,$req) = splice @_, 0, 2;
 
-  my ($notify) = Win32::ChangeNotify->new($req->{path}, $req->{subtree}, $req->{filter});
+  my $notify = Win32::ChangeNotify->new($req->{path}, $req->{subtree}, $req->{filter});
 
   unless ( $notify ) {
-	delete ( $req->{result} );
+	delete $req->{result};
 	$req->{error} = "Couldn't create Win32::ChangeNotify object";
 	my $replies = $filter->put( [ $req ] );
 	print STDOUT @$replies;
@@ -224,7 +215,7 @@ sub watch_path {
 
   while ( $req->{always} ) {
 	$notify->reset;
-	my ($result) = $notify->wait;
+	my $result = $notify->wait;
 
 	if ( $result ) {
 	  $req->{result} = $result;
@@ -300,7 +291,11 @@ POE::Component::Win32::ChangeNotify is a POE wrapper around L<Win32::ChangeNotif
 
 =item spawn
 
-Takes a number of arguments, all of which are optional. 'alias', the kernel alias to bless the component with; 'options', a hashref of L<POE::Session|POE::Session> options that are passed to the component's session creator.
+Takes a number of arguments, all of which are optional.
+
+  'alias', the kernel alias to bless the component with; 
+  'options', a hashref of POE::Session options that are passed to the component's 
+             session creator.
 
 =item session_id
 
@@ -319,7 +314,13 @@ These are the events that the component will accept.
 
 Starts monitoring the specified path for the specified types of changes.
 
-Accepts one argument, a hashref containing the following keys: 'path', the filesystem path to monitor, mandatory; 'filter', a string containing whitespace or '|' separated notification flags, see L<Win32::ChangeNotify|Win32::ChangeNotify> for details, defaults to all notification flags; 'subtree', set this to true value to monitor all subdirectories under 'path'; 'event', the event handler to post results back to, mandatory.
+Accepts one argument, a hashref containing the following keys: 
+
+  'path', the filesystem path to monitor, mandatory; 
+  'event', the event handler to post results back to, mandatory.
+  'filter', a string containing whitespace or '|' separated notification flags, 
+            see Win32::ChangeNotify for details, defaults to all notification flags; 
+  'subtree', set this to true value to monitor all subdirectories under 'path'; 
 
      $kernel->post( 'blah' => monitor => 
      {
