@@ -1,10 +1,11 @@
 Changes
 examples/synopsis.pl
-mylib/Devel/AssertOS.pm
-mylib/Devel/AssertOS/Cygwin.pm
-mylib/Devel/AssertOS/MSWin32.pm
-mylib/Devel/CheckOS.pm
+inc/Devel/AssertOS.pm
+inc/Devel/AssertOS/Cygwin.pm
+inc/Devel/AssertOS/MSWin32.pm
+inc/Devel/CheckOS.pm
 inc/Module/Install.pm
+inc/Module/Install/AssertOS.pm
 inc/Module/Install/AuthorTests.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -21,6 +22,6 @@ META.yml
 README
 t/00_startup.t
 t/01_touchme.t
+test_file
 xt/99_pod.t
 xt/99_pod_coverage.t
-test_file
