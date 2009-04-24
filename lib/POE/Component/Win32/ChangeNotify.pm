@@ -14,7 +14,7 @@ use Win32::ChangeNotify;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '1.16';
+$VERSION = '1.18';
 
 sub spawn {
   my $package = shift;
@@ -301,7 +301,7 @@ POE::Component::Win32::ChangeNotify is a POE wrapper around L<Win32::ChangeNotif
 
 =over
 
-=item spawn
+=item C<spawn>
 
 Takes a number of arguments, all of which are optional.
 
@@ -309,7 +309,7 @@ Takes a number of arguments, all of which are optional.
   'options', a hashref of POE::Session options that are passed to the component's 
              session creator.
 
-=item session_id
+=item C<session_id>
 
 Takes no arguments, returns the L<POE::Session> ID of the component. Useful if you don't want to use
 aliases.
@@ -322,7 +322,7 @@ These are the events that the component will accept.
 
 =over
 
-=item monitor
+=item C<monitor>
 
 Starts monitoring the specified path for the specified types of changes.
 
@@ -342,7 +342,7 @@ Accepts one argument, a hashref containing the following keys:
 	'subtree' => 1,
      } );
 
-=item unmonitor
+=item C<unmonitor>
 
 Stops monitoring the specified path.
 
@@ -350,7 +350,7 @@ Accepts one mandatory argument, 'path', the filesystem path to stop monitoring.
 
    $kernel->post( 'blah' => unmonitor => path => '.' );
 
-=item shutdown
+=item C<shutdown>
 
 Has no arguments. Shuts down the component gracefully. All monitored paths will be closed.
 
@@ -370,7 +370,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 LICENSE
 
-Copyright C<(c)> Chris Williams.
+Copyright E<copy> Chris Williams.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
@@ -378,3 +378,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 L<Win32::ChangeNotify>
 
+=cut

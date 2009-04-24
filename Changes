@@ -1,6 +1,10 @@
 POE::Component::Win32::ChangeNotify
 ===================================
 
+1.18	Fri Apr 24 11:35:35 BST 2009
+	- Switch to git repository
+	- Tidy up POD
+
 1.16	Tue May 13 14:07:50 GMTDT 2008
 	- Added license information
 
