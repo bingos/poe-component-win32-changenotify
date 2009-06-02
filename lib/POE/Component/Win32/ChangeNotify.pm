@@ -10,11 +10,12 @@ package POE::Component::Win32::ChangeNotify;
 use strict;
 use warnings;
 use POE 0.38 qw(Wheel::Run Filter::Reference Filter::Line);
+use Win32;
 use Win32::ChangeNotify;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '1.18';
+$VERSION = '1.20';
 
 sub spawn {
   my $package = shift;
@@ -218,7 +219,8 @@ sub _watch_path {
 
   unless ( $notify ) {
 	delete $req->{result};
-	$req->{error} = "Couldn't create Win32::ChangeNotify object";
+	$req->{error} = "Couldn't create Win32::ChangeNotify object: " .
+				Win32::FormatMessage( Win32::GetLastError() );
 	my $replies = $filter->put( [ $req ] );
 	print STDOUT @$replies;
 	return 0;
