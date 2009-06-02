@@ -24,6 +24,7 @@ META.yml
 README
 t/00_startup.t
 t/01_touchme.t
+t/02_error.t
 test_file
 xt/99_pod.t
 xt/99_pod_coverage.t
