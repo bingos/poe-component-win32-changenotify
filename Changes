@@ -1,6 +1,10 @@
 POE::Component::Win32::ChangeNotify
 ===================================
 
+1.20	Tue Jun  2 14:17:28 BST 2009
+	- Update Makefile.PL meta and add additional 
+          diagnostics when Win32::ChangeNotify errors.
+
 1.18	Fri Apr 24 11:35:35 BST 2009
 	- Switch to git repository
 	- Tidy up POD
