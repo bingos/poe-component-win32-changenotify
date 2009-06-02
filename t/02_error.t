@@ -29,7 +29,7 @@ sub test_start {
         'filter' => 'ATTRIBUTES DIR_NAME FILE_NAME LAST_WRITE SECURITY SIZE',
         'subtree' => 1,
      } );
-  $kernel->delay( '_touch' => 2 );
+#  $kernel->delay( '_touch' => 2 );
   undef;
 }
 
@@ -42,10 +42,8 @@ sub touch_file {
 
 sub file_was_touched {
   my ($kernel,$hashref) = @_[KERNEL,ARG0];
-
-  use Data::Dumper;
-  diag(Dumper($hashref));
-  pass('File was touched') unless $hashref->{error};
+  pass('File was touched') if $hashref->{error};
+  diag($hashref->{error});
   $kernel->post( 'blah' => 'shutdown' );
   undef;
 }
