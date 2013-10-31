@@ -7,15 +7,14 @@
 
 package POE::Component::Win32::ChangeNotify;
 
+#ABSTRACT: A POE wrapper around Win32::ChangeNotify.
+
 use strict;
 use warnings;
 use POE 0.38 qw(Wheel::Run Filter::Reference Filter::Line);
 use Win32;
 use Win32::ChangeNotify;
 use Carp qw(carp croak);
-use vars qw($VERSION);
-
-$VERSION = '1.20';
 
 sub spawn {
   my $package = shift;
@@ -29,7 +28,7 @@ sub spawn {
 
   $self->{session_id} = POE::Session->create(
 	  object_states => [
-	  	$self => [ qw(_start _sig_chld child_closed child_error child_stderr child_stdout shutdown monitor unmonitor) ],
+		  $self => [ qw(_start _sig_chld child_closed child_error child_stderr child_stdout shutdown monitor unmonitor) ],
 	  ],
 	  ( ( defined ( $options ) and ref ( $options ) eq 'HASH' ) ? ( options => $options ) : () ),
   )->ID();
@@ -246,11 +245,8 @@ sub _watch_path {
 }
 
 1;
-__END__
 
-=head1 NAME
-
-POE::Component::Win32::ChangeNotify - A POE wrapper around Win32::ChangeNotify.
+=pod
 
 =head1 SYNOPSIS
 
@@ -365,16 +361,6 @@ Each event sent by the component has a hashref as ARG0. This is the hashref that
 =head1 CAVEATS
 
 This module will only work on Win32. But you guessed that already :)
-
-=head1 AUTHOR
-
-Chris Williams <chris@bingosnet.co.uk>
-
-=head1 LICENSE
-
-Copyright E<copy> Chris Williams.
-
-This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
